@@ -1,10 +1,10 @@
 // Custom Jumptable
 // every 2-byte entry represents a program counter location for the selected function:
-// 0x 002C 0033 0002 0003 0004 0005 0006 0007 0008 0009 000A 000B 000C 000D 000E 000F
+// 0x 002C 0060 0002 0003 0004 0005 0006 0007 0008 0009 000A 000B 000C 000D 000E 000F
 // 002C : jumpdest of the first function (__EXAMPLE_FUNCTION_1 as defined below)
-// 0033 : jumpdest of the second function (__EXAMPLE_FUNCTION_2 as defined below)
+// 0060 : jumpdest of the second function (__EXAMPLE_FUNCTION_2 as defined below)
 // 0002 : jumpdest of the third function, and so on.
-#define constant _JUMPTABLE = 0x002C003300020003000400050006000700080009000A000B000C000D000E000F
+#define constant _JUMPTABLE = 0x002C006000020003000400050006000700080009000A000B000C000D000E000F
 
 
 // Define some demo functions for testing purposes
@@ -12,7 +12,7 @@
 #define function __EXAMPLE_FUNCTION_2() pure returns ()
 
 
-// example calldata to provide: 0xF0 (=240 bits =30 bytes)
+// example calldata to reach function 1: 0xF0 (=240 bits =30 bytes)
 // in this case: 
 // 0x002C003300020003000400050006000700080009000A000B000C000D000E000F   original jumptable
 // 0x000000000000000000000000000000000000000000000000000000000000002C   shitfted by 30 bytes to the right
@@ -59,15 +59,15 @@
 #define macro __EXAMPLE_FUNCTION_1() = takes (0) returns (0) {
   jumpdest              // PC: 0x2C
   0x20 0x00 mstore      // Return "hello from function 1"
-  0x0d 0x20 mstore
+  0x15 0x20 mstore
   __RIGHTPAD(0x68656c6c6f2066726f6d2066756e6374696f6e2031) 0x40 mstore
   0x60 0x00 return
 }
 
 #define macro __EXAMPLE_FUNCTION_2() = takes (0) returns (0) {
-  jumpdest              // PC: 0x2C //todo
+  jumpdest              // PC: 0x60
   0x20 0x00 mstore      // Return "hello from function 2"
-  0x0d 0x20 mstore
+  0x15 0x20 mstore
   __RIGHTPAD(0x68656c6c6f2066726f6d2066756e6374696f6e2032) 0x40 mstore
   0x60 0x00 return
 }
