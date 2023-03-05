@@ -6,8 +6,7 @@ Inspired by the latest [article by Degatchi](https://degatchi.com/articles/smart
 
 Under canonical ABI standards, the first 4 bytes of transaction `calldata` is reserved for the function `selector`. These bytes are matched against the selectors of all the defined functions in the contract. If a match is found, the program jumps to the corresponding function and executes it.
 
-This concept is called function dispatching, and its standard Solidity implementation in assembly
-looks something like this:
+The standard Solidity implementation looks something like this:
 
 ```javascript
     PUSH1 0x00        // [0x00]
@@ -24,15 +23,21 @@ looks something like this:
     /* end dispatcher loop */
 ```
 
-The `JUMPI` instruction jumps to the function code if the selector matches the function signature. If no match is found, the program continues to the next function signature.
+The `JUMPI` instruction jumps to the function code (at `PC=0x40` in the example above) if its selector (`0x12345678` in the above example) matches the one provided in the calldata. If no match is found, the program continues to the next function signature.
 
 There is an alternative approach which can be used for optimization: the [binary search dispatching](https://docs.huff.sh/tutorial/function-dispatching/#binary-search-dispatching) method. This method is more gas-efficient in the case of a large number of functions, but the specific savings depend on the number of arbitrary pivot points you choose for the binary search.
 
-This repo implements a third approach, which is **outside of the standard ABI**. [Degatchi](https://degatchi.com/articles/smart-contract-obfuscation#single-word-jumptable)'s idea is to use a single-byte selector, which is then used to shift into a jump table. The jump table is a 32-bytes word packed with program counter locations corresponding to the function jump destinations. This way, we don't have to iterate over the function selectors and can jump directly to the right function.
+This repo implements a third approach, which is **outside of the standard ABI**.
 
-## Getting started
+## How it works
 
-The proof of concept implementation is in [src/CustomDispatcher.huff](./src/CustomDispatcher.huff). You can get started and run the tests with the following commands (this assumes you have Foundry and Huff installed):
+[Degatchi](https://degatchi.com/articles/smart-contract-obfuscation#single-word-jumptable)'s idea is to use a single-byte selector, which is then used to shift into a jump table. The jump table is a 32-bytes word packed with program counter locations corresponding to the function jump destinations program counters. This way, we don't have to iterate over the function selectors and can jump directly to the right function, which saves some gas if the number of functions is large enough.
+
+Please take a look at the source code at [src/CustomDispatcher.huff](./src/CustomDispatcher.huff) for the full details.
+
+## Running the tests
+
+You can get started and run the tests with the following commands (assuming you have Foundry and Huff installed):
 
 ```shell
 git clone git@github.com:merklefruit/huff-custom-dispatcher.git
@@ -46,7 +51,7 @@ TODO
 
 ## Acknowledgements
 
-- [degatchi's article on this topic](https://degatchi.com/articles/smart-contract-obfuscation#single-word-jumptable)
+- [degatchi's article on evm obfuscation](https://degatchi.com/articles/smart-contract-obfuscation#single-word-jumptable)
 - [huff-project-template](https://github.com/huff-language/huff-project-template)
 - [forge-template](https://github.com/foundry-rs/forge-template)
 - [femplate](https://github.com/abigger87/femplate)

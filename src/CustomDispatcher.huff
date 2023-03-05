@@ -7,7 +7,7 @@
 #define constant _JUMPTABLE = 0x002C006000020003000400050006000700080009000A000B000C000D000E000F
 
 
-// Define some demo functions for testing purposes
+// Define some demo functions
 #define function __EXAMPLE_FUNCTION_1() pure returns ()
 #define function __EXAMPLE_FUNCTION_2() pure returns ()
 
@@ -15,6 +15,7 @@
 // example calldata to reach function 1: 0xF0 (=240 bits =30 bytes)
 // in this case: 
 // 0x002C003300020003000400050006000700080009000A000B000C000D000E000F   original jumptable
+//   ^-----------------------------------------------------------v
 // 0x000000000000000000000000000000000000000000000000000000000000002C   shitfted by 30 bytes to the right
 // result:  0x2C
 // mask:    0xFFFF
