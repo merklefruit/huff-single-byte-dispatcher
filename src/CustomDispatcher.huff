@@ -57,15 +57,17 @@
 
 
 #define macro __EXAMPLE_FUNCTION_1() = takes (0) returns (0) {
-  jumpdest              // PC: 0x2d
-  0x20 0x00 mstore      // Return "Hello, world"
+  jumpdest              // PC: 0x2C
+  0x20 0x00 mstore      // Return "hello from function 1"
   0x0d 0x20 mstore
-  __RIGHTPAD(0x48656c6c6f2c20776f726c6421) 0x40 mstore
+  __RIGHTPAD(0x68656c6c6f2066726f6d2066756e6374696f6e2031) 0x40 mstore
   0x60 0x00 return
 }
 
 #define macro __EXAMPLE_FUNCTION_2() = takes (0) returns (0) {
-  jumpdest             // PC: 0x33
-  0x00 0x00 eq
-  stop
+  jumpdest              // PC: 0x2C //todo
+  0x20 0x00 mstore      // Return "hello from function 2"
+  0x0d 0x20 mstore
+  __RIGHTPAD(0x68656c6c6f2066726f6d2066756e6374696f6e2032) 0x40 mstore
+  0x60 0x00 return
 }
