@@ -40,7 +40,7 @@ Please take a look at the source code at [src/CustomDispatcher.huff](./src/Custo
 You can get started and run the tests with the following commands (assuming you have Foundry and Huff installed):
 
 ```shell
-git clone git@github.com:merklefruit/huff-custom-dispatcher.git
+git clone git@github.com:merklefruit/huff-single-byte-dispatcher.git
 cd huff-custom-dispatcher
 forge test
 ```
