@@ -1,2 +1,2 @@
-CustomDispatcherTest:testCanReachFunction1() (gas: 32084)
-CustomDispatcherTest:testCanReachFunction2() (gas: 32151)
+CustomDispatcherTest:testCanReachFunction1() (gas: 32073)
+CustomDispatcherTest:testCanReachFunction2() (gas: 32140)

@@ -45,6 +45,12 @@ cd huff-custom-dispatcher
 forge test
 ```
 
+## Limitations and caveats
+
+- Since this implementation breaks the ABI standard, any contract with this setup won't be compatible with all the existing tooling. You will need to specify calldata manually which is not very convenient.
+- The jump table is a 32-byte word with 2-bytes program counters. This means that the maximum number of functions that can be dispatched is 16. This is not a problem for most contracts, but it's something to keep in mind.
+- Filling the jumptable with the correct program counters corresponding to the function jump destinations is tricky and error-prone. This is where automated tools could come in handy, until then you will have to do it manually with a debugger like [evm.codes](https://evm.codes) or [forge](https://book.getfoundry.sh/reference/forge/forge-debug).
+
 ## Benchmarks
 
 TODO
