@@ -9,18 +9,18 @@ Under canonical ABI standards, the first 4 bytes of transaction `calldata` is re
 The standard Solidity implementation looks something like this:
 
 ```javascript
-    PUSH1 0x00        // [0x00]
-    CALLDATALOAD      // [calldata[0:32]]
-    PUSH1 0xE0        // [0xE0, calldata[0:32]]
-    SHR               // [selector]
+PUSH1 0x00        // [0x00]
+CALLDATALOAD      // [calldata[0:32]]
+PUSH1 0xE0        // [0xE0, calldata[0:32]]
+SHR               // [selector]
 
-    /* dispatcher loop, run n times for n functions */
-    DUP1              // [selector, selector]
-    PUSH4 0x12345678  // [0x12345678, selector, selector]
-    EQ                // [0x12345678 == selector, selector]
-    PUSH1 0x40        // [0x40, 0x12345678 == selector, selector]
-    JUMPI             // [selector]
-    /* end dispatcher loop */
+/* dispatcher loop, run n times for n functions */
+DUP1              // [selector, selector]
+PUSH4 0x12345678  // [0x12345678, selector, selector]
+EQ                // [0x12345678 == selector, selector]
+PUSH1 0x40        // [0x40, 0x12345678 == selector, selector]
+JUMPI             // [selector]
+/* end dispatcher loop */
 ```
 
 The `JUMPI` instruction jumps to the function code (at `PC=0x40` in the example above) if its selector (`0x12345678` in the above example) matches the one provided in the calldata. If no match is found, the program continues to the next function signature.
@@ -31,7 +31,7 @@ This repo implements a third approach, which is **outside of the standard ABI**.
 
 ## How it works
 
-[Degatchi](https://degatchi.com/articles/smart-contract-obfuscation#single-word-jumptable)'s idea is to use a single-byte selector, which is then used to shift into a jump table. The jump table is a 32-bytes word packed with program counter locations corresponding to the function jump destinations program counters. This way, we don't have to iterate over the function selectors and can jump directly to the right function, which saves some gas if the number of functions is large enough.
+The idea is to use a single-byte selector, which is then used to shift into a jump table. The jump table is a 32-bytes word packed with program counter locations corresponding to the function jump destinations program counters. This way, we don't have to iterate over the function selectors and can jump directly to the right function, which saves some gas if the number of functions is large enough.
 
 Please take a look at the source code at [src/CustomDispatcher.huff](./src/CustomDispatcher.huff) for the full details.
 
@@ -48,12 +48,32 @@ forge test
 ## Limitations and caveats
 
 - Since this implementation breaks the ABI standard, any contract with this setup won't be compatible with all the existing tooling. You will need to specify calldata manually which is not very convenient.
-- The jump table is a 32-byte word with 2-bytes program counters. This means that the maximum number of functions that can be dispatched is 16. This is not a problem for most contracts, but it's something to keep in mind.
+- The jump table is a 32-byte word with 2-bytes program counters. This means that the maximum number of functions that can be dispatched is 16.
 - Filling the jumptable with the correct program counters corresponding to the function jump destinations is tricky and error-prone. This is where automated tools could come in handy, until then you will have to do it manually with a debugger like [evm.codes](https://evm.codes) or [forge](https://book.getfoundry.sh/reference/forge/forge-debug).
 
 ## Benchmarks
 
-TODO
+Here is a comparison of the gas cost of the standard ABI dispatcher and the single byte one for a contract with 16 functions.
+
+### Standard ABI dispatcher
+
+- Gas cost: **34** for the first function
+- Incremental gas cost: **22** for each subsequent function
+
+### Single-byte dispatcher
+
+- Gas cost: **32**
+- Incremental gas cost: **0**
+
+### Comparison
+
+Here are the marginal gas savings expressed as a function of the function position _n_:
+
+> _c(n) = ((34 + 22 \* (n - 1)) / 32 - 1) \* 100_
+
+- Savings to reach the n = 1st function: ~6%
+- Savings to reach the n = 8th function: ~487%
+- Savings to reach the n = 16th function: ~1037%
 
 ## Acknowledgements
 
