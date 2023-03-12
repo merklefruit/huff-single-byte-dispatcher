@@ -53,8 +53,6 @@ forge test
 
 ## Benchmarks
 
-Here is a comparison of the gas cost of the standard ABI dispatcher and the single byte one for a contract with 16 functions.
-
 ### Standard ABI dispatcher
 
 - Gas cost: **34** for the first function
